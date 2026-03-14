@@ -30,3 +30,25 @@ src
 │
 ├ app.ts
 └ server.ts
+
+
+
+ADMIN
+ ├ all permissions
+
+MANAGER
+ ├ dashboard.view
+ ├ users.read
+ ├ users.create
+ ├ users.update
+ ├ leads.manage
+ ├ tasks.manage
+ ├ reports.view
+
+AGENT
+ ├ dashboard.view
+ ├ leads.read
+ ├ tasks.read
+
+CUSTOMER
+ ├ dashboard.view
