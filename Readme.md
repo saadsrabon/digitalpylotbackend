@@ -274,8 +274,8 @@ JWT_SECRET=supersecret JWT_REFRESH_SECRET=superrefreshsecret
 
 Clone repository
 
-git clone `<repository-url>`{=html}\
-cd rbac-system
+git clone `https://github.com/saadsrabon/digitalpylotbackend.git`
+cd digitalpylotbackend
 
 Install dependencies
 
@@ -301,7 +301,7 @@ The seed script creates an administrator.
 
 Email
 
-admin@system.com
+demoadmin@digitalpylot.com
 
 Password
 
@@ -321,10 +321,3 @@ Admin123!
 
 ------------------------------------------------------------------------
 
-## ✦ Next Step
-
-Frontend implementation with Next.js
-
--   Middleware based permission routing
--   Dynamic sidebar rendering
--   Permission editor UI
