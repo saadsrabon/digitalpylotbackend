@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken"
 
-const ACCESS_SECRET = process.env.JWT_SECRET as string
-const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string
+import { env } from "../config/env"
+
+const { JWT_REFRESH_SECRET: REFRESH_SECRET, JWT_SECRET: ACCESS_SECRET } = env
 
 export function generateAccessToken(payload: object) {
   return jwt.sign(payload, ACCESS_SECRET, {
