@@ -1,13 +1,17 @@
 import { Request, Response } from "express"
 import * as authService from "./auth.service"
 import prisma from "../../config/prisma"
+import { auditAction } from "../../utils/audit"
 
 export async function login(req:Request, res:Response) {
 
   const { email, password } = req.body
 
   const tokens = await authService.login(email, password)
-
+  await auditAction(
+  tokens.userId,
+  "LOGIN"
+)
   res.cookie("accessToken", tokens.accessToken, {
     httpOnly: true,
     sameSite: "lax",
@@ -29,7 +33,7 @@ export async function refresh(req:Request, res:Response) {
   const token = req.cookies.refreshToken
 
   const accessToken = await authService.refreshToken(token)
-
+  
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     sameSite: "lax",
@@ -47,9 +51,13 @@ export async function logout(req:Request, res:Response) {
     where: { refreshToken },
     data: { revoked: true }
   })
-
+    await auditAction(
+  req.user!.id,
+  "LOGOUT"
+)
   res.clearCookie("accessToken")
   res.clearCookie("refreshToken")
 
   res.json({ message: "Logged out" })
+
 }

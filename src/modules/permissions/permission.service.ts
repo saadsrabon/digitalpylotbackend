@@ -1,5 +1,7 @@
 import prisma from "../../config/prisma"
-
+import { resolveUserPermissions } from "../../services/permission.service"
+import { AppError } from "../../errors/AppError"
+import { auditAction } from "../../utils/audit"
 export async function getAllPermissions() {
 
   return prisma.permission.findMany({
@@ -39,8 +41,7 @@ export async function getUserPermissions(userId: string) {
 
 }
 
-import { resolveUserPermissions } from "../../services/permission.service"
-import { AppError } from "../../errors/AppError"
+
 
 export async function updateUserPermissions(
   actorId: string,
@@ -77,6 +78,13 @@ export async function updateUserPermissions(
       permissionId
     }))
   })
+
+  await auditAction(
+  actorId,
+  "PERMISSION_UPDATED",
+  targetUserId,
+  { permissionIds }
+)
 
   return { success: true }
 

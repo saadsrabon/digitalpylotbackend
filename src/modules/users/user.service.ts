@@ -1,4 +1,5 @@
 import prisma from "../../config/prisma"
+import { auditAction } from "../../utils/audit"
 import { hashPassword } from "../../utils/password"
 import { CreateUserDTO } from "./user.types"
 
@@ -22,7 +23,7 @@ export async function createUser(data: CreateUserDTO) {
 
   const hashedPassword = await hashPassword(data.password)
 
-  return prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       name: data.name,
       email: data.email,
@@ -34,6 +35,14 @@ export async function createUser(data: CreateUserDTO) {
       role: true
     }
   })
+
+  const actorId = data.managerId || user.id
+  await auditAction(
+  actorId,
+  "USER_CREATED",
+  user.id
+)
+  return user
 }
 
 export async function getUsers() {
