@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 // import morgan from "morgan";
 import routes from "./routes";
+import { errorMiddleware } from "./middleware/error.middleware";
 
 const app = express();
 
@@ -12,5 +13,6 @@ app.use(cookieParser());
 // app.use(morgan("dev"));
 
 app.use("/api", routes);
+app.use(errorMiddleware)
 
 export default app;

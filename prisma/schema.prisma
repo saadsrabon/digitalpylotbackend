@@ -34,11 +34,28 @@ model User {
 
   permissions UserPermission[]
 
+  sessions Session[]   // 👈 add this
+
   createdAt DateTime @default(now())
 
   auditLogs AuditLog[] @relation("ActorLogs")
 }
+model Session {
+  id String @id @default(uuid())
 
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  refreshToken String @unique
+
+  userAgent String?
+  ipAddress String?
+
+  revoked Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
 model Role {
   id   String @id @default(uuid())
   name String @unique
