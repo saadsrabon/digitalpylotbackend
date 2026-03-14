@@ -1,39 +1,36 @@
 import { Request, Response } from "express"
 import * as permissionService from "./permission.service"
 
-interface IdParams {
-  id: string
-}
-
-export async function getPermissions(req: Request, res: Response) {
+export async function getPermissions(
+  req: Request,
+  res: Response
+): Promise<void> {
 
   const permissions = await permissionService.getAllPermissions()
 
   res.json(permissions)
-
 }
 
 export async function getUserPermissions(
-  req: Request<IdParams>,
+  req: Request,
   res: Response
-) {
+): Promise<void> {
 
-  const { id } = req.params
+  const id = req.params.id as string
 
   const result = await permissionService.getUserPermissions(id)
 
   res.json(result)
-
 }
 
 export async function updateUserPermissions(
-  req: Request<IdParams>,
+  req: Request,
   res: Response
-) {
+): Promise<void> {
 
-  const actorId = (req as any).user.id
+  const actorId =  req.user!.id
 
-  const { id } = req.params
+  const id = req.params.id as string
   const { permissionIds } = req.body
 
   const result = await permissionService.updateUserPermissions(
@@ -43,5 +40,4 @@ export async function updateUserPermissions(
   )
 
   res.json(result)
-
 }
