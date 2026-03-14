@@ -140,14 +140,59 @@ import prisma from "../src/config/prisma";
 //     process.exit(1);
 //   });
 
-const roles = await prisma.role.findMany({
-  include: {
-    permissions: {
-      include: {
-        permission: true
-      }
-    }
-  }
-})
 
-console.log(JSON.stringify(roles, null, 2))
+import bcrypt from "bcrypt"
+
+async function seedAdmin() {
+
+  const adminEmail = "demoadmin@digitalpylot.com"
+  const adminPassword = "Admin123!"
+
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: adminEmail }
+  })
+
+  if (existingAdmin) {
+    console.log("Admin already exists")
+    return
+  }
+
+  const adminRole = await prisma.role.findUnique({
+    where: { name: "ADMIN" }
+  })
+
+  if (!adminRole) {
+    throw new Error("ADMIN role not found")
+  }
+
+  const hashedPassword = await bcrypt.hash(adminPassword, 10)
+
+  await prisma.user.create({
+    data: {
+      name: "System Admin",
+      email: adminEmail,
+      password: hashedPassword,
+      roleId: adminRole.id
+    }
+  })
+
+  console.log("Admin user created")
+}
+
+async function main() {
+
+ 
+
+  await seedAdmin()
+
+}
+main()
+  .then(async () => {
+    await prisma.$disconnect()
+  })
+  .catch(async (error) => {
+    console.error(error)
+    await prisma.$disconnect()
+    process.exit(1)
+  })
+export default seedAdmin
