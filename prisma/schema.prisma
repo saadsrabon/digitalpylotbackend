@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+
+  roleId    String
+  role      Role @relation(fields: [roleId], references: [id])
+
+  managerId String?
+  manager   User?  @relation("ManagerRelation", fields: [managerId], references: [id])
+  agents    User[] @relation("ManagerRelation")
+
+  status    UserStatus @default(ACTIVE)
+
+  permissions UserPermission[]
+
+  createdAt DateTime @default(now())
+
+  auditLogs AuditLog[] @relation("ActorLogs")
+}
+
+model Role {
+  id   String @id @default(uuid())
+  name String @unique
+
+  users       User[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String @id @default(uuid())
+  key         String @unique
+  description String?
+
+  roles RolePermission[]
+  users UserPermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+}
+
+model UserPermission {
+  userId       String
+  permissionId String
+
+  user       User       @relation(fields: [userId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([userId, permissionId])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+
+  actorId   String
+  actor     User     @relation("ActorLogs", fields: [actorId], references: [id])
+
+  action    String
+  targetId  String?
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+}
